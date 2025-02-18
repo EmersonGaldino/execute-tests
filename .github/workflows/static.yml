@@ -2,8 +2,8 @@ name: Run Tests and Deploy Allure Report
 
 on:
   push:
-    branches: ["main"]  # Roda quando há push na branch main
-  workflow_dispatch:  # Permite rodar manualmente
+    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,10 +34,16 @@ jobs:
           sudo apt install -y allure
 
       - name: Run API tests with Maven
-        run: mvn clean test
+        run: mvn clean test -Dallure.results.directory=target/allure-results
+
+      - name: Debug Allure Results
+        run: ls -R target/allure-results || echo "Allure results not found!"
 
       - name: Generate Allure Report
-        run: mvn allure:report
+        run: mvn allure:report -Dallure.results.directory=target/allure-results
+
+      - name: Debug Allure Report Directory
+        run: ls -R ./target/site/ || echo "Allure report not found!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -45,7 +51,7 @@ jobs:
       - name: Upload Allure Report Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './target/site/allure-maven-plugin'
+          path: ./target/site/allure-maven-plugin
 
       - name: Deploy to GitHub Pages
         id: deployment
