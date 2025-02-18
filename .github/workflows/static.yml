@@ -45,7 +45,7 @@ jobs:
       - name: Upload Allure Report Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './target/site/allure-results'
+          path: './site/allure-maven-plugin'
 
       - name: Deploy to GitHub Pages
         id: deployment
