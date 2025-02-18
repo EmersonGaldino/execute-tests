@@ -37,13 +37,13 @@ jobs:
         run: mvn clean test -Dallure.results.directory=target/allure-results
 
       - name: Debug Allure Results
-        run: ls -R target/allure-results || echo "Allure results not found!"
+        run: ls -R allure-results || echo "Allure results not found!"
 
       - name: Generate Allure Report
-        run: mvn allure:report -Dallure.results.directory=target/allure-results
+        run: mvn allure:report -Dallure.results.directory=allure-results
 
       - name: Debug Allure Report Directory
-        run: ls -R ./target/site/ || echo "Allure report not found!"
+        run: ls -R ./site/ || echo "Allure report not found!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -51,7 +51,7 @@ jobs:
       - name: Upload Allure Report Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./target/site/allure-maven-plugin
+          path: ./site/allure-maven-plugin
 
       - name: Deploy to GitHub Pages
         id: deployment
