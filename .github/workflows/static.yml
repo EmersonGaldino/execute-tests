@@ -1,0 +1,58 @@
+name: Run Tests and Deploy Allure Report
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '18'
+
+      - name: Install Allure
+        run: |
+          sudo apt-add-repository universe -y
+          sudo apt update
+          sudo apt install -y allure
+
+      - name: Run API tests with Maven
+        run: mvn clean test -Dallure.results.directory=target/allure-results
+
+      - name: Debug Allure Results
+        run: ls -R allure-results || echo "Allure results not found!"
+
+      - name: Generate Allure Report
+        run: mvn allure:report -Dallure.results.directory=allure-results
+
+      - name: Debug Allure Report Directory
+        run: ls -R ./site/ || echo "Allure report not found!"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Allure Report Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site/allure-maven-plugin
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
