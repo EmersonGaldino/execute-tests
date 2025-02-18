@@ -1,0 +1,40 @@
+image: maven:3.8.5-openjdk-17
+
+stages:
+  - test
+  - report
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  key: maven
+  paths:
+    - .m2/repository/
+
+before_script:
+  - apt-get update && apt-get install -y unzip
+  - curl -o allure-2.24.0.zip -sSL https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.zip
+  - unzip allure-2.24.0.zip && mv allure-2.24.0 /opt/allure
+  - export PATH=$PATH:/opt/allure/bin
+  - allure --version
+
+test:
+  stage: test
+  script:
+    - mvn clean test
+  artifacts:
+    paths:
+      - target/allure-results/
+    when: always
+
+report:
+  stage: report
+  script:
+    - allure generate target/allure-results/ --clean -o allure-report
+  artifacts:
+    paths:
+      - allure-report/
+    when: always
+  only:
+    - main
