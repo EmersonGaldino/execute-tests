@@ -58,7 +58,11 @@ jobs:
 
       - name: Generate Allure report
         run: mvn allure:report
-
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git fetch origin gh-pages || echo "Branch gh-pages ainda não existe"
       - name: Deploy Allure Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
